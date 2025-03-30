@@ -100,6 +100,57 @@
             cursor: pointer;
         }
 
+        .legend {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .legend-gradient {
+            width: 200px;
+            height: 8px;
+            background: linear-gradient(to right,
+                #f97316,    /* Orange for decrease */
+                #f5f5f5,    /* Light gray for neutral */
+                #0d9488     /* Teal for increase */
+            );
+            border-radius: 999px;
+            position: relative;
+        }
+
+        .legend-label {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.decrease {
+            background: #f97316;
+        }
+
+        .legend-dot.increase {
+            background: #0d9488;
+        }
+
         .footer {
             text-align: center;
             padding: 1.5rem 1rem;
@@ -133,6 +184,20 @@
             #map-container {
                 min-height: 300px;
             }
+
+            .legend {
+                bottom: 10px;
+                padding: 8px 12px;
+                gap: 12px;
+            }
+
+            .legend-gradient {
+                width: 120px;
+            }
+
+            .legend-label {
+                font-size: 0.75rem;
+            }
         }
 
         @media (min-width: 1200px) {
@@ -143,6 +208,10 @@
             #map-container {
                 height: calc(100vh - 200px);
                 min-height: 600px;
+            }
+
+            .legend {
+                bottom: 30px;
             }
         }
     </style>
@@ -156,6 +225,17 @@
     <div id="map-container">
         <div id="world-map"></div>
         <div id="tooltip"></div>
+        <div class="legend">
+            <span class="legend-label">
+                <span class="legend-dot decrease"></span>
+                Decreased Support
+            </span>
+            <div class="legend-gradient"></div>
+            <span class="legend-label">
+                <span class="legend-dot increase"></span>
+                Increased Support
+            </span>
+        </div>
     </div>
 
     <footer class="footer">

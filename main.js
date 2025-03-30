@@ -381,7 +381,15 @@ function createModal() {
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         max-width: 500px;
         width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
         z-index: 1000;
+        -webkit-overflow-scrolling: touch;
+        @media (max-width: 375px) {
+            width: 95%;
+            padding: 16px;
+            top: 45%;
+        }
     `;
 
     const overlay = document.createElement('div');
@@ -397,20 +405,8 @@ function createModal() {
         z-index: 999;
     `;
 
-    const footer = document.createElement('div');
-    footer.style.cssText = `
-        margin: 40px auto 20px;
-        text-align: center;
-        font-size: 0.875rem;
-        color: #6b7280;
-    `;
-    footer.innerHTML = `
-        Built in Sunny Singapore by <a href="https://github.com/tongrhj" target="_blank" rel="noopener noreferrer" style="color: #3b82f6; text-decoration: none;">Jared</a>
-    `;
-
     document.body.appendChild(modal);
     document.body.appendChild(overlay);
-    document.body.appendChild(footer);
 
     overlay.addEventListener('click', () => {
         modal.style.display = 'none';
@@ -429,49 +425,51 @@ function showElectionDetails(countryCode, countryName) {
     const overlay = document.getElementById('modal-overlay');
 
     if (data) {
-        const changeColor = data.supportChange >= 0 ? '#0d9488' : '#f97316';  // Teal for increase, Orange for decrease
+        const changeColor = data.supportChange >= 0 ? '#0d9488' : '#f97316';
         const changeSymbol = data.supportChange >= 0 ? '+' : '';
 
         modal.innerHTML = `
-            <div style="padding: 1.5rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--color-text);">${countryName} Election Results</h2>
-                <div style="margin: 1.5rem 0; padding: 1.25rem; background: var(--color-bg); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
-                    <p style="color: ${changeColor}; font-size: 1.75rem; font-weight: 600; margin: 0;">
+            <div style="padding: 0.75rem;">
+                <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--color-text);">${countryName}</h2>
+                <div style="margin: 0.75rem 0; padding: 0.75rem; background: var(--color-bg); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                    <p style="color: ${changeColor}; font-size: 1.5rem; font-weight: 600; margin: 0;">
                         ${changeSymbol}${data.supportChange}% Support Change
                     </p>
                 </div>
-                <div style="display: grid; gap: 1rem;">
-                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                <div style="display: grid; gap: 0.75rem; font-size: 0.875rem;">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
                         <div>
-                            <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 0.25rem;">Previous Result</p>
-                            <p style="font-size: 1.125rem; font-weight: 500; color: var(--color-text);">${data.previousResult}</p>
+                            <p style="color: var(--color-text-secondary); margin-bottom: 0.125rem;">Previous</p>
+                            <p style="font-weight: 500; color: var(--color-text);">${data.previousResult}</p>
                         </div>
                         <div>
-                            <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 0.25rem;">Current Result</p>
-                            <p style="font-size: 1.125rem; font-weight: 500; color: var(--color-text);">${data.currentResult}</p>
+                            <p style="color: var(--color-text-secondary); margin-bottom: 0.125rem;">Current</p>
+                            <p style="font-weight: 500; color: var(--color-text);">${data.currentResult}</p>
                         </div>
                     </div>
-                    <div style="height: 1px; background: var(--color-border); margin: 0.5rem 0;"></div>
-                    <div>
-                        <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 0.25rem;">Election Date</p>
-                        <p style="font-size: 1rem; color: var(--color-text);">${data.electionDate}</p>
+                    <div style="height: 1px; background: var(--color-border); margin: 0.25rem 0;"></div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
+                        <div>
+                            <p style="color: var(--color-text-secondary); margin-bottom: 0.125rem;">Date</p>
+                            <p style="color: var(--color-text);">${data.electionDate}</p>
+                        </div>
+                        <div>
+                            <p style="color: var(--color-text-secondary); margin-bottom: 0.125rem;">Turnout</p>
+                            <p style="color: var(--color-text);">${data.voterTurnout}</p>
+                        </div>
                     </div>
                     <div>
-                        <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 0.25rem;">Voter Turnout</p>
-                        <p style="font-size: 1rem; color: var(--color-text);">${data.voterTurnout}</p>
+                        <p style="color: var(--color-text-secondary); margin-bottom: 0.125rem;">Incumbent</p>
+                        <p style="color: var(--color-text);">${data.incumbentParty}</p>
                     </div>
                     <div>
-                        <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 0.25rem;">Incumbent Party</p>
-                        <p style="font-size: 1rem; color: var(--color-text);">${data.incumbentParty}</p>
+                        <p style="color: var(--color-text-secondary); margin-bottom: 0.125rem;">Opposition</p>
+                        <p style="color: var(--color-text);">${data.opposition}</p>
                     </div>
+                    <div style="height: 1px; background: var(--color-border); margin: 0.25rem 0;"></div>
                     <div>
-                        <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 0.25rem;">Main Opposition</p>
-                        <p style="font-size: 1rem; color: var(--color-text);">${data.opposition}</p>
-                    </div>
-                    <div style="height: 1px; background: var(--color-border); margin: 0.5rem 0;"></div>
-                    <div>
-                        <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 0.25rem;">Analysis</p>
-                        <p style="font-size: 1rem; color: var(--color-text); line-height: 1.5;">${data.details}</p>
+                        <p style="color: var(--color-text-secondary); margin-bottom: 0.125rem;">Analysis</p>
+                        <p style="color: var(--color-text); line-height: 1.4;">${data.details}</p>
                     </div>
                 </div>
             </div>
@@ -481,21 +479,21 @@ function showElectionDetails(countryCode, countryName) {
         overlay.style.display = 'block';
     } else if (upcomingData) {
         modal.innerHTML = `
-            <div style="padding: 1.5rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--color-text);">${countryName} Upcoming Election</h2>
-                <div style="margin: 1.5rem 0; padding: 1.25rem; background: var(--color-bg); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
-                    <p style="color: var(--color-text); font-size: 1.75rem; font-weight: 600; margin: 0;">
+            <div style="padding: 0.75rem;">
+                <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: var(--color-text);">${countryName}</h2>
+                <div style="margin: 0.75rem 0; padding: 0.75rem; background: var(--color-bg); border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+                    <p style="color: var(--color-text); font-size: 1.5rem; font-weight: 600; margin: 0;">
                         ${upcomingData.electionDate}
                     </p>
                 </div>
-                <div style="display: grid; gap: 1rem;">
+                <div style="display: grid; gap: 0.75rem; font-size: 0.875rem;">
                     <div>
-                        <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 0.25rem;">Election Type</p>
-                        <p style="font-size: 1rem; color: var(--color-text);">${upcomingData.type}</p>
+                        <p style="color: var(--color-text-secondary); margin-bottom: 0.125rem;">Type</p>
+                        <p style="color: var(--color-text);">${upcomingData.type}</p>
                     </div>
                     <div>
-                        <p style="font-size: 0.875rem; color: var(--color-text-secondary); margin-bottom: 0.25rem;">Current Incumbent Party</p>
-                        <p style="font-size: 1rem; color: var(--color-text);">${upcomingData.incumbentParty}</p>
+                        <p style="color: var(--color-text-secondary); margin-bottom: 0.125rem;">Current Incumbent</p>
+                        <p style="color: var(--color-text);">${upcomingData.incumbentParty}</p>
                     </div>
                 </div>
             </div>
@@ -511,18 +509,36 @@ async function initMap() {
     createModal();
 
     // Set up dimensions
-    const width = document.getElementById('map-container').clientWidth;
-    const height = width * 0.5;
+    const container = document.getElementById('map-container');
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    // Clear any existing SVG
+    d3.select('#world-map').selectAll('*').remove();
 
     // Create SVG
     const svg = d3.select('#world-map')
         .append('svg')
-        .attr('viewBox', `0 0 ${width} ${height}`)
-        .attr('preserveAspectRatio', 'xMidYMid meet');
+        .attr('width', width)
+        .attr('height', height)
+        .style('display', 'block');
+
+    // Create a container for zoom
+    const g = svg.append('g');
+
+    // Set up zoom behavior
+    const zoom = d3.zoom()
+        .scaleExtent([1, 8])
+        .on('zoom', (event) => {
+            g.attr('transform', event.transform);
+        });
+
+    // Apply zoom behavior to SVG
+    svg.call(zoom);
 
     // Create a projection
     const projection = d3.geoMercator()
-        .scale(width / 2 / Math.PI)
+        .scale(Math.min(width / 2.5 / Math.PI, height * 0.9))
         .translate([width / 2, height / 2]);
 
     // Create a path generator
@@ -534,8 +550,8 @@ async function initMap() {
         const worldData = await response.json();
         const countries = topojson.feature(worldData, worldData.objects.countries);
 
-        // Draw countries
-        svg.selectAll('path')
+        // Draw countries in the container group
+        g.selectAll('path')
             .data(countries.features)
             .enter()
             .append('path')
@@ -595,7 +611,6 @@ let resizeTimeout;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-        document.getElementById('world-map').innerHTML = '';
         initMap();
     }, 250);
 });

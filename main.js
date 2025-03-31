@@ -1,3 +1,60 @@
+// Add theme management at the top of the file
+const isDarkMode = () => document.documentElement.getAttribute('data-theme') === 'dark';
+
+// Load theme from system preference or localStorage
+function initTheme() {
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const savedTheme = localStorage.getItem('theme');
+
+    const setTheme = (theme) => {
+        document.documentElement.setAttribute('data-theme', theme);
+        updateThemeToggleIcon();
+        initMap(); // Initialize map after setting theme
+    };
+
+    const setThemeFromMediaQuery = (e) => {
+        // Only update theme if user hasn't manually set a preference
+        if (!localStorage.getItem('theme')) {
+            setTheme(e.matches ? 'dark' : 'light');
+        }
+    };
+
+    // Set initial theme
+    if (savedTheme) {
+        // Use saved theme if it exists
+        setTheme(savedTheme);
+    } else {
+        // Otherwise use system preference
+        setThemeFromMediaQuery(darkModeMediaQuery);
+    }
+
+    // Listen for system theme changes
+    darkModeMediaQuery.addEventListener('change', setThemeFromMediaQuery);
+}
+
+// Update theme toggle icon based on current theme
+function updateThemeToggleIcon() {
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.innerHTML = isDarkMode() ? '☀️' : '🌙';
+}
+
+// Toggle theme function
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme); // Save the manually selected theme
+    updateThemeToggleIcon();
+    initMap(); // Redraw the map with new theme colors
+}
+
+// Add event listener for theme toggle button and window load
+window.addEventListener('load', initTheme);
+document.addEventListener('DOMContentLoaded', () => {
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.addEventListener('click', toggleTheme);
+});
+
 const upcomingElections = {
     "124": { // Canada
         electionDate: "October 2025",
@@ -343,21 +400,22 @@ function getCountryData(iso) {
 const getColor = (value) => {
     if (value === undefined || value === null) {
         // Check if country has upcoming elections
-        return '#e2e8f0';  // Light gray for no data
+        return isDarkMode() ? '#1f2937' : '#e2e8f0';  // Darker gray for dark mode
     }
     const maxChange = 10; // Maximum expected change percentage
     const normalizedValue = Math.max(-maxChange, Math.min(maxChange, value)) / maxChange;
+    const darkModifier = isDarkMode() ? 0.8 : 1; // Reduce color intensity in dark mode
 
     if (value < 0) {
         // Orange scale for decrease (from light to dark)
-        const intensity = Math.abs(normalizedValue);
+        const intensity = Math.abs(normalizedValue) * darkModifier;
         const r = Math.round(255 * (1 - intensity * 0.02));  // 249/255
         const g = Math.round(255 * (1 - intensity * 0.55));  // 115/255
         const b = Math.round(255 * (1 - intensity * 0.91));  // 22/255
         return `rgb(${r}, ${g}, ${b})`;
     } else {
         // Teal scale for increase (from light to dark)
-        const intensity = normalizedValue;
+        const intensity = normalizedValue * darkModifier;
         const r = Math.round(255 * (1 - intensity * 0.95));  // 13/255
         const g = Math.round(255 * (1 - intensity * 0.42));  // 148/255
         const b = Math.round(255 * (1 - intensity * 0.47));  // 136/255
@@ -375,16 +433,17 @@ function createModal() {
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: white;
+        background: var(--color-modal-bg);
         padding: 20px;
         border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         max-width: 500px;
         width: 90%;
         max-height: 90vh;
         overflow-y: auto;
         z-index: 1000;
         -webkit-overflow-scrolling: touch;
+        color: var(--color-text);
         @media (max-width: 375px) {
             width: 95%;
             padding: 16px;
@@ -401,7 +460,7 @@ function createModal() {
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0,0,0,0.5);
+        background: var(--color-modal-overlay);
         z-index: 999;
     `;
 
@@ -411,6 +470,7 @@ function createModal() {
     overlay.addEventListener('click', () => {
         modal.style.display = 'none';
         overlay.style.display = 'none';
+        document.body.classList.remove('modal-open');
     });
 }
 
@@ -423,6 +483,7 @@ function showElectionDetails(countryCode, countryName) {
 
     const modal = document.getElementById('election-modal');
     const overlay = document.getElementById('modal-overlay');
+    document.body.classList.add('modal-open');
 
     if (data) {
         const changeColor = data.supportChange >= 0 ? '#0d9488' : '#f97316';
@@ -546,7 +607,7 @@ async function initMap() {
 
     // Load world map data
     try {
-        const response = await fetch('https://unpkg.com/world-atlas@2/countries-110m.json');
+        const response = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json');
         const worldData = await response.json();
         const countries = topojson.feature(worldData, worldData.objects.countries);
 
@@ -562,7 +623,7 @@ async function initMap() {
                 const color = getColor(data?.supportChange);
                 return color;
             })
-            .style('stroke', '#fff')
+            .style('stroke', isDarkMode() ? '#374151' : '#fff')  // Darker borders in dark mode
             .style('stroke-width', '0.5px')
             .on('mouseover', function (event, d) {
                 const tooltip = document.getElementById('tooltip');
@@ -602,9 +663,6 @@ async function initMap() {
         console.error('Error loading map data:', error);
     }
 }
-
-// Initialize the map when the page loads
-window.addEventListener('load', initMap);
 
 // Handle window resize
 let resizeTimeout;
